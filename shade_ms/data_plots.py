@@ -165,9 +165,9 @@ def get_plot_data(msinfo, group_cols, mytaql, chan_freqs,
                           freqs=freqs,
                           wavel=wavel,
                           rows=group.row,
-                          baselines=baselines if baselines else np.array([baseline]))
-
-            nchan = len(group.chan)
+                          baselines=baselines if baselines is not None else np.array([baseline])
+                    )
+            nchan = len(chans)
             if flag is not None:
                 flag = flag[dict(chan=chanslice)]
                 nchan = flag.shape[1]
@@ -487,14 +487,14 @@ def create_plot(ddf, index_subsets, xdatum, ydatum, adatum, ared, cdatum, cmap, 
 
     for funcname, args, kwargs in extra_markup:
         getattr(ax, funcname)(*args, **kwargs)
-    
+
     # any 1D arrays like freq and WAVEL that is dask arrays at this point needs
     # compute called
     compute_arrays = dict(filter(lambda x: isinstance(x[1], da.Array), limits.items()))
     limits.update(dict(zip(compute_arrays.keys(), da.compute(*compute_arrays.values()))))
 
-    ax.imshow(X=rgb.data, 
-              extent=[limits['xmin'], 
+    ax.imshow(X=rgb.data,
+              extent=[limits['xmin'],
                       limits['xmax'],
                       limits['ymin'],
                       limits['ymax']],
